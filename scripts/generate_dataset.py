@@ -11,7 +11,7 @@ from random import uniform
 
 tags = [_ for _ in string.lowercase]
 start_time = datetime.datetime.utcnow()
-output = open("/mnt/data/dataset", "w")
+output = open("dataset", "w")
 for equs_id in xrange(1, 100):
     equs_time = copy.deepcopy(start_time)
     for tag_index in xrange(1, 60 * 60):  # 1 day / per second

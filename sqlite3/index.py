@@ -4,7 +4,7 @@ from sys import stdin
 import sqlite3
 import msgpack
 
-conn = sqlite3.connect('/mnt/data/output/sqlite3/tags.db')
+conn = sqlite3.connect('tags.db')
 
 
 def create_tbl(conn):
@@ -31,7 +31,7 @@ def insert_tags(conn):
         for o in unpacker:
             objs.append(o)
 
-        if len(objs) > 200:
+        if len(objs) > 3600:
             conn.executemany(
                 'INSERT INTO readings'
                 ' (equipment, channel, value)'

@@ -1,18 +1,26 @@
 #!/usr/bin/env python
 from sys import stdin
-import plyvel
-Traceback (most recent call last):
-
 import simplejson as json
+import msgpack
+import requests
 
-def insert_data():
-    db = plyvel.DB('/home/zack/leveldb/', create_if_missing=True)
+def insert_tags():
+    objs = []
+    unpacker = msgpack.Unpacker()
+    for buff in stdin:
+        unpacker.feed(buff)
+        for o in unpacker:
+            objs.append({
+                "key": "%s$%s$%s" % (o["eqid"], o["tag"], o["at"]),
+                "value": o["value"]
+            })
 
-    for line in stdin:
-        obj = json.loads(line)
-        db.put(obj["topic"] + "-" + obj["payload"]["at"], line)
+        if len(objs) > 3600:
+            r = requests.post('http://localhost:5000/batch', json=objs)
+            objs = []
 
-    db.close()
+    if len(objs) > 0:
+        r = requests.post('http://localhost:5000/batch', json=objs)
+        objs = []
 
-result = benchmark(insert_data)
-assert result is None
+insert_tags()
