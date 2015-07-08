@@ -6,7 +6,7 @@ from __future__ import print_function
 import datetime
 import string
 import copy
-import simplejson as json
+import msgpack
 from random import uniform
 
 tags = [_ for _ in string.lowercase]
@@ -17,18 +17,20 @@ for equs_id in xrange(1, 100):
     for tag_index in xrange(1, 60 * 60):  # 1 day / per second
         equs_time = equs_time + datetime.timedelta(0, 1)
         obj = {
-            "topic": "/equs/" + str(equs_id),
-            "payload": {
-                "at": equs_time.isoformat(),
-                "tags": []
-            }
+            "eqid": str(equs_id),
+            "at": equs_time.isoformat(),
+            "tag": '',
+            "value": ''
         }
+
         for tag in tags:
-            obj["payload"]["tags"].append({
-                    "id": tag,
-                    "value": uniform(0, 9)
-                })
-        output.write(json.dumps(obj) + "\n")
+            obj["tag"] = tag
+            obj["value"] = uniform(0, 9)
+            # output.write(json.dumps(obj) + "\n")
+            output.write(msgpack.packb(obj))
 
     print (str(equs_id) + " has been generated.")
+
+output.write('\n')
+output.close()
 print ("All done.")
